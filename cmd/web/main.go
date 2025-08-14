@@ -31,8 +31,15 @@ func main() {
 	mux.HandleFunc("/snippet/create", snippetCreate)
 
 	infoLog.Printf("This application was started by %s", cfg.invoker)
+	infoLog.Printf("Server will run on port %s.", cfg.addr)
 
-	err := http.ListenAndServe(cfg.addr, mux)
+	srv := &http.Server{
+		Addr:     cfg.addr,
+		ErrorLog: errorLog,
+		Handler:  mux,
+	}
+
+	err := srv.ListenAndServe()
 
 	infoLog.Printf("Server is running on port %s.", cfg.addr)
 	errorLog.Fatal(err)
