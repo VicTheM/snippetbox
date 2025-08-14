@@ -12,6 +12,11 @@ type config struct {
 	invoker string
 }
 
+type application struct {
+	errorLog *log.Logger
+	infoLog  *log.Logger
+}
+
 func main() {
 	var cfg config
 	flag.StringVar(&cfg.addr, "addr", ":4001", "Port server will listen on")
@@ -21,23 +26,19 @@ func main() {
 	infoLog := log.New(os.Stdout, "[INFO]\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "[ERROR]\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	mux := http.NewServeMux()
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
-
-	// Registering routes
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/snippet/view", snippetView)
-	mux.HandleFunc("/snippet/create", snippetCreate)
-
-	infoLog.Printf("This application was started by %s", cfg.invoker)
-	infoLog.Printf("Server will run on port %s.", cfg.addr)
+	app := &application{
+		errorLog: errorLog,
+		infoLog:  infoLog,
+	}
 
 	srv := &http.Server{
 		Addr:     cfg.addr,
 		ErrorLog: errorLog,
-		Handler:  mux,
+		Handler:  app.routes(),
 	}
+
+	infoLog.Printf("This application was started by %s", cfg.invoker)
+	infoLog.Printf("Server will run on port %s.", cfg.addr)
 
 	err := srv.ListenAndServe()
 
