@@ -27,7 +27,7 @@ func main() {
 	var cfg config
 	flag.StringVar(&cfg.addr, "addr", ":4001", "Port server will listen on")
 	flag.StringVar(&cfg.invoker, "invoker", "Victory", "The person who started the application")
-	flag.StringVar(&cfg.dsn, "dsn", "web:62453170Vic@/snippetbox?parseTime=true", "Database connection data source name")
+	flag.StringVar(&cfg.dsn, "dsn", "web:@62453170Vic@/snippetbox?parseTime=true", "Database connection data source name")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "[INFO]\t", log.Ldate|log.Ltime)
